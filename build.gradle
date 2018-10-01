@@ -30,3 +30,18 @@ dependencies {
     ext.slf4jVersion = "1.7.25"
     implementation "org.slf4j:slf4j-api:$slf4jVersion"
 }
+
+apply plugin: 'maven-publish'
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            group = 'io.github.galbiston'
+            version = '1.0.0'
+            artifactId = 'expiring-index'
+            from components.java
+        }
+    }
+}
+
+build.finalizedBy(publishToMavenLocal)
+
