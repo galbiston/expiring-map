@@ -1,1 +1,3 @@
 rootProject.name = 'expiring-map'
+
+enableFeaturePreview('STABLE_PUBLISHING')
