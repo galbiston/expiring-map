@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.galbiston.expiring_index;
+package io.github.galbiston.expiring_map;
 
 import java.util.Objects;
 

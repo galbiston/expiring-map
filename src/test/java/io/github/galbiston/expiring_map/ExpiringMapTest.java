@@ -15,10 +15,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.galbiston.expiring_index;
+package io.github.galbiston.expiring_map;
 
-import static io.github.galbiston.expiring_index.IndexDefaultValues.INDEX_CLEANER_INTERVAL;
-import static io.github.galbiston.expiring_index.IndexDefaultValues.MINIMUM_INDEX_CLEANER_INTERVAL;
+import static io.github.galbiston.expiring_map.MapDefaultValues.MAP_CLEANER_INTERVAL;
+import static io.github.galbiston.expiring_map.MapDefaultValues.MINIMUM_MAP_CLEANER_INTERVAL;
 import org.junit.After;
 import org.junit.AfterClass;
 import static org.junit.Assert.assertEquals;
@@ -30,9 +30,9 @@ import org.junit.Test;
  *
  *
  */
-public class ExpiringIndexTest {
+public class ExpiringMapTest {
 
-    public ExpiringIndexTest() {
+    public ExpiringMapTest() {
     }
 
     @BeforeClass
@@ -52,7 +52,7 @@ public class ExpiringIndexTest {
     }
 
     /**
-     * Test of put method, of class ExpiringIndex.
+     * Test of put method, of class ExpiringMap.
      *
      * @throws java.lang.InterruptedException
      */
@@ -64,7 +64,7 @@ public class ExpiringIndexTest {
         long cleanerInterval = 1000l;
         long halfExpiryInterval = expiryInterval / 2;
 
-        ExpiringIndex<String, String> instance = new ExpiringIndex<>("Test", 5, expiryInterval, cleanerInterval);
+        ExpiringMap<String, String> instance = new ExpiringMap<>("Test", 5, expiryInterval, cleanerInterval);
 
         instance.put("key1", "value1");
         instance.put("key2", "value2");
@@ -87,7 +87,7 @@ public class ExpiringIndexTest {
     }
 
     /**
-     * Test of put method, of class ExpiringIndex.
+     * Test of put method, of class ExpiringMap.
      *
      * @throws java.lang.InterruptedException
      */
@@ -99,7 +99,7 @@ public class ExpiringIndexTest {
         long halfExpiryInterval = expiryInterval / 2;
         long quarterExpiryInterval = expiryInterval / 3 * 4;
 
-        ExpiringIndex<String, String> instance = new ExpiringIndex<>("Test", 5, expiryInterval, halfExpiryInterval);
+        ExpiringMap<String, String> instance = new ExpiringMap<>("Test", 5, expiryInterval, halfExpiryInterval);
 
         instance.put("key1", "value1");
         instance.put("key2", "value2");
@@ -122,7 +122,7 @@ public class ExpiringIndexTest {
     }
 
     /**
-     * Test of put method, of class ExpiringIndex.
+     * Test of put method, of class ExpiringMap.
      *
      * @throws java.lang.InterruptedException
      */
@@ -134,7 +134,7 @@ public class ExpiringIndexTest {
         long cleanerInterval = 1000l;
         long halfExpiryInterval = expiryInterval / 2;
 
-        ExpiringIndex<String, String> instance = new ExpiringIndex<>("Test", 5, expiryInterval, cleanerInterval);
+        ExpiringMap<String, String> instance = new ExpiringMap<>("Test", 5, expiryInterval, cleanerInterval);
 
         instance.put("key1", "value1");
         instance.put("key2", "value2");
@@ -157,13 +157,13 @@ public class ExpiringIndexTest {
     }
 
     /**
-     * Test of setCleanerInterval method, of class ExpiringIndex.
+     * Test of setCleanerInterval method, of class ExpiringMap.
      */
     @Test
     public void testSetCleanerInterval() {
         System.out.println("setCleanerInterval");
         long cleanerInterval = 2000L;
-        ExpiringIndex instance = new ExpiringIndex<>("Test", 5);
+        ExpiringMap instance = new ExpiringMap<>("Test", 5);
         instance.setCleanerInterval(cleanerInterval);
         long expResult = cleanerInterval;
         long result = instance.getCleanerInterval();
@@ -174,15 +174,15 @@ public class ExpiringIndexTest {
     }
 
     /**
-     * Test of setCleanerInterval method, of class ExpiringIndex.
+     * Test of setCleanerInterval method, of class ExpiringMap.
      */
     @Test
     public void testSetCleanerInterval_minimum() {
         System.out.println("setCleanerInterval_minimum");
         long cleanerInterval = 0L;
-        ExpiringIndex instance = new ExpiringIndex<>("Test", 5);
+        ExpiringMap instance = new ExpiringMap<>("Test", 5);
         instance.setCleanerInterval(cleanerInterval);
-        long expResult = MINIMUM_INDEX_CLEANER_INTERVAL;
+        long expResult = MINIMUM_MAP_CLEANER_INTERVAL;
         long result = instance.getCleanerInterval();
 
         //System.out.println("Exp: " + expResult);
@@ -191,13 +191,13 @@ public class ExpiringIndexTest {
     }
 
     /**
-     * Test of setExpiryInterval method, of class ExpiringIndex.
+     * Test of setExpiryInterval method, of class ExpiringMap.
      */
     @Test
     public void testSetExpiryInterval() {
         System.out.println("setExpiryInterval");
         long expiryInterval = 2000L;
-        ExpiringIndex instance = new ExpiringIndex<>("Test", 5);
+        ExpiringMap instance = new ExpiringMap<>("Test", 5);
         instance.setExpiryInterval(expiryInterval);
         long expResult = expiryInterval;
         long result = instance.getExpiryInterval();
@@ -208,15 +208,15 @@ public class ExpiringIndexTest {
     }
 
     /**
-     * Test of setExpiryInterval method, of class ExpiringIndex.
+     * Test of setExpiryInterval method, of class ExpiringMap.
      */
     @Test
     public void testSetExpiryInterval_minimum() {
         System.out.println("setExpiryInterval_minimum");
         long expiryInterval = 0L;
-        ExpiringIndex instance = new ExpiringIndex<>("Test", 5);
+        ExpiringMap instance = new ExpiringMap<>("Test", 5);
         instance.setExpiryInterval(expiryInterval);
-        long expResult = INDEX_CLEANER_INTERVAL + 1;
+        long expResult = MAP_CLEANER_INTERVAL + 1;
         long result = instance.getExpiryInterval();
 
         //System.out.println("Exp: " + expResult);

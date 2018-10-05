@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.galbiston.expiring_index;
+package io.github.galbiston.expiring_map;
 
 import java.util.Collections;
 import java.util.SortedSet;
@@ -27,30 +27,30 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  *
  */
-public class ExpiringIndexCleaner extends TimerTask {
+public class ExpiringMapCleaner extends TimerTask {
 
     //private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final SortedSet<KeyTimestampPair> tracking = Collections.synchronizedSortedSet(new TreeSet<>());
     private final ConcurrentHashMap<Object, Long> refresh = new ConcurrentHashMap<>();
-    private final ExpiringIndex index;
+    private final ExpiringMap map;
     private long expiryInterval;
 
-    public ExpiringIndexCleaner(ExpiringIndex index, long expiryInterval) {
-        this.index = index;
+    public ExpiringMapCleaner(ExpiringMap map, long expiryInterval) {
+        this.map = map;
         this.expiryInterval = expiryInterval;
     }
 
-    public ExpiringIndexCleaner(ExpiringIndexCleaner indexCleaner) {
-        this.index = indexCleaner.index;
-        this.expiryInterval = indexCleaner.expiryInterval;
-        tracking.addAll(indexCleaner.tracking);
-        refresh.putAll(indexCleaner.refresh);
+    public ExpiringMapCleaner(ExpiringMapCleaner mapCleaner) {
+        this.map = mapCleaner.map;
+        this.expiryInterval = mapCleaner.expiryInterval;
+        tracking.addAll(mapCleaner.tracking);
+        refresh.putAll(mapCleaner.refresh);
     }
 
     @Override
     public void run() {
 
-        //LOGGER.info("Run Start - Tracker: {}, Refresh: {}, Index: {}", tracking.size(), refresh.size(), index.size());
+        //LOGGER.info("Run Start - Tracker: {}, Refresh: {}, Map: {}", tracking.size(), refresh.size(), map.size());
         long thresholdTimestamp = System.currentTimeMillis() - expiryInterval;
         boolean isEarlier = true;
         while (isEarlier) {
@@ -71,12 +71,12 @@ public class ExpiringIndexCleaner extends TimerTask {
                     }
                     refresh.remove(key);
                 } else {
-                    index.remove(key);
+                    map.remove(key);
                 }
 
             }
         }
-        //LOGGER.info("Run End - Tracker: {}, Refresh: {}, Index: {}", tracking.size(), refresh.size(), index.size());
+        //LOGGER.info("Run End - Tracker: {}, Refresh: {}, Map: {}", tracking.size(), refresh.size(), map.size());
     }
 
     public synchronized void refresh(Object key) {

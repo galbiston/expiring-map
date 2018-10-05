@@ -37,7 +37,7 @@ publishing {
         mavenJava(MavenPublication) {
             group = 'io.github.galbiston'
             version = '1.0.0'
-            artifactId = 'expiring-index'
+            artifactId = 'expiring-map'
             from components.java
         }
     }

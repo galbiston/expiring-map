@@ -15,21 +15,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.galbiston.expiring_index;
+package io.github.galbiston.expiring_map;
 
 /**
  *
  *
  */
-public interface IndexDefaultValues {
+public interface MapDefaultValues {
 
-    public static final int UNLIMITED_INDEX = -1;
+    public static final int UNLIMITED_MAP = -1;
     public static final long UNLIMITED_EXPIRY = 0;
 
-    public static final int NO_INDEX = 0;
-    public static final long INDEX_EXPIRY_INTERVAL = 5000l;
-    public static final long INDEX_CLEANER_INTERVAL = 1000l;
-    public static final long FULL_INDEX_WARNING_INTERVAL = 30000l;
-    public static final long MINIMUM_INDEX_CLEANER_INTERVAL = 100l;
+    public static final int NO_MAP = 0;
+    public static final long MAP_EXPIRY_INTERVAL = 5000l;
+    public static final long MAP_CLEANER_INTERVAL = 1000l;
+    public static final long FULL_MAP_WARNING_INTERVAL = 30000l;
+    public static final long MINIMUM_MAP_CLEANER_INTERVAL = 100l;
     public static final int UNLIMITED_INITIAL_CAPACITY = 50000;
 }
