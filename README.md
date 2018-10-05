@@ -1,6 +1,6 @@
 # Expiring Map
 
-Small library to provide in-memory storage which expires entries if un-used for a period of time.
+Small library to provide in-memory storage which expires entries if unused for a period of time.
 Size of map, duration until expiry and frequency of cleaning can all be controlled.
 
 ## Access
