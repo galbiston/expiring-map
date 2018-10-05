@@ -21,8 +21,8 @@ import static io.github.galbiston.expiring_map.MapDefaultValues.FULL_MAP_WARNING
 import static io.github.galbiston.expiring_map.MapDefaultValues.MAP_CLEANER_INTERVAL;
 import static io.github.galbiston.expiring_map.MapDefaultValues.MAP_EXPIRY_INTERVAL;
 import static io.github.galbiston.expiring_map.MapDefaultValues.MINIMUM_MAP_CLEANER_INTERVAL;
-import static io.github.galbiston.expiring_map.MapDefaultValues.UNLIMITED_MAP;
 import static io.github.galbiston.expiring_map.MapDefaultValues.UNLIMITED_INITIAL_CAPACITY;
+import static io.github.galbiston.expiring_map.MapDefaultValues.UNLIMITED_MAP;
 import java.lang.invoke.MethodHandles;
 import java.util.Timer;
 import java.util.concurrent.ConcurrentHashMap;
@@ -30,10 +30,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Expiring Map for storage of entries which expire if unused for a period of
+ * time.
+ * <br>Size of map, duration until expiry and frequency of cleaning can all be
+ * controlled.
  *
- *
- * @param <K>
- * @param <V>
+ * @param <K> Key entry object.
+ * @param <V> Value entry object.
  */
 public class ExpiringMap<K, V> extends ConcurrentHashMap<K, V> {
 
