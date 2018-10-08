@@ -10,7 +10,7 @@ Expiring Map can be accessed as a library using Maven etc. from Maven Central.
 <dependency>
     <groupId>io.github.galbiston</groupId>
     <artifactId>expiring-map</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
 </dependency>
 ```
 
