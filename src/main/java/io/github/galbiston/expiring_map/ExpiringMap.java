@@ -150,24 +150,45 @@ public class ExpiringMap<K, V> extends ConcurrentHashMap<K, V> {
         return value;
     }
 
+    /**
+     * Clear the map.
+     */
     @Override
     public void clear() {
         super.clear();
         mapCleaner.clear();
     }
 
+    /**
+     *
+     * @return Maximum number of items in the map.
+     */
     public long getMaxSize() {
         return maxSize;
     }
 
+    /**
+     * Maximum number of items in the map.
+     *
+     * @param maxSize
+     */
     public void setMaxSize(long maxSize) {
         this.maxSize = maxSize > UNLIMITED_MAP ? maxSize : Long.MAX_VALUE;
     }
 
+    /**
+     *
+     * @return Frequency that items are checked for removal from map.
+     */
     public long getCleanerInterval() {
         return cleanerInterval;
     }
 
+    /**
+     * Frequency that items are checked for removal from map.
+     *
+     * @param cleanerInterval Milliseconds
+     */
     public final void setCleanerInterval(long cleanerInterval) {
         if (MINIMUM_MAP_CLEANER_INTERVAL < cleanerInterval) {
             this.cleanerInterval = cleanerInterval;
@@ -177,10 +198,19 @@ public class ExpiringMap<K, V> extends ConcurrentHashMap<K, V> {
         }
     }
 
+    /**
+     *
+     * @return Duration that items remain in map.
+     */
     public long getExpiryInterval() {
         return expiryInterval;
     }
 
+    /**
+     * Duration that items remain in map.
+     *
+     * @param expiryInterval Milliseconds
+     */
     public final void setExpiryInterval(long expiryInterval) {
 
         long minimum_interval = cleanerInterval + 1;
@@ -196,20 +226,21 @@ public class ExpiringMap<K, V> extends ConcurrentHashMap<K, V> {
         }
     }
 
+    /**
+     *
+     * @return Delay between warnings the map is full.
+     */
     public long getFullMapWarningInterval() {
         return fullMapWarningInterval;
     }
 
+    /**
+     * Delay between warnings the map is full.
+     *
+     * @param fullMapWarningInterval Milliseconds
+     */
     public void setFullMapWarningInterval(long fullMapWarningInterval) {
         this.fullMapWarningInterval = fullMapWarningInterval;
-    }
-
-    public long getFullMapWarning() {
-        return fullMapWarning;
-    }
-
-    public void setFullMapWarning(long fullMapWarning) {
-        this.fullMapWarning = fullMapWarning;
     }
 
     public String getLabel() {
@@ -220,10 +251,18 @@ public class ExpiringMap<K, V> extends ConcurrentHashMap<K, V> {
         this.label = label;
     }
 
+    /**
+     * Start expiring items from the map.
+     */
     public void startExpiry() {
         startExpiry(cleanerInterval);
     }
 
+    /**
+     * Start expiring items from the map with adjusted cleaner interval.
+     *
+     * @param cleanerInterval Milliseconds
+     */
     public void startExpiry(long cleanerInterval) {
         if (cleanerTimer == null) {
             setCleanerInterval(cleanerInterval);
@@ -233,6 +272,9 @@ public class ExpiringMap<K, V> extends ConcurrentHashMap<K, V> {
         }
     }
 
+    /**
+     * Stop expiring items from the map.
+     */
     public void stopExpiry() {
         if (cleanerTimer != null) {
             cleanerTimer.cancel();
