@@ -31,6 +31,9 @@ dependencies {
     //Logging Framework
     ext.slf4jVersion = "1.7.25"
     implementation "org.slf4j:slf4j-api:$slf4jVersion"
+    
+    ext.logbackVersion = "1.2.3"
+    testImplementation "ch.qos.logback:logback-classic:$logbackVersion"
 }
 
 
