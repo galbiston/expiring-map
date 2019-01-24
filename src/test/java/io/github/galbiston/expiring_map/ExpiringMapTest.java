@@ -291,4 +291,184 @@ public class ExpiringMapTest {
         assertEquals(expResult, result);
     }
 
+    /**
+     * Test of put method, of class ExpiringMap.
+     *
+     * @throws java.lang.InterruptedException
+     */
+    @Test
+    public void testExpiry_change_max_size() throws InterruptedException {
+        System.out.println("expiry_change_max_size");
+
+        long expiryInterval = 2000l;
+        long cleanerInterval = 1000l;
+        long halfExpiryInterval = expiryInterval / 2;
+
+        ExpiringMap<String, String> instance = new ExpiringMap<>("Test", 5, expiryInterval, cleanerInterval);
+
+        instance.put("key1", "value1");
+        instance.put("key2", "value2");
+        instance.put("key3", "value3");
+        instance.put("key4", "value4");
+        instance.startExpiry();
+        Thread.sleep(halfExpiryInterval + 100);
+        instance.setMaxSize(10);
+        instance.put("key5", "value5");
+        instance.put("key6", "value6");
+        //System.out.println("Size Before: " + instance.size());
+        instance.stopExpiry();
+        //System.out.println("Size After: " + instance.size());
+        int result = instance.size();
+        int expResult = 6;
+
+        //System.out.println("Exp: " + expResult);
+        //System.out.println("Res: " + result);
+        assertEquals(expResult, result);
+    }
+
+    /**
+     * Test of put method, of class ExpiringMap.
+     *
+     * @throws java.lang.InterruptedException
+     */
+    @Test
+    public void testExpiry_change_max_size_reduced() throws InterruptedException {
+        System.out.println("expiry_change_max_size_reduced");
+
+        long expiryInterval = 2000l;
+        long cleanerInterval = 1000l;
+        long halfExpiryInterval = expiryInterval / 2;
+
+        ExpiringMap<String, String> instance = new ExpiringMap<>("Test", 10, expiryInterval, cleanerInterval);
+
+        instance.put("key1", "value1");
+        instance.put("key2", "value2");
+        instance.put("key3", "value3");
+        instance.put("key4", "value4");
+        instance.startExpiry();
+        Thread.sleep(halfExpiryInterval + 100);
+
+        instance.put("key5", "value5");
+        instance.put("key6", "value6");
+        instance.setMaxSize(5);
+        instance.put("key7", "value7"); //Should be rejected.
+        //System.out.println("Size Before: " + instance.size());
+        instance.stopExpiry();
+        //System.out.println("Size After: " + instance.size());
+        int result = instance.size();
+        int expResult = 6;  //Over max size but don't remove until expired.
+
+        //System.out.println("Exp: " + expResult);
+        //System.out.println("Res: " + result);
+        assertEquals(expResult, result);
+    }
+
+    /**
+     * Test of put method, of class ExpiringMap.
+     *
+     * @throws java.lang.InterruptedException
+     */
+    @Test
+    public void testExpiry_change_expiry_interval() throws InterruptedException {
+        System.out.println("expiry_change_expiry_interval");
+
+        long expiryInterval = 2000l;
+        long cleanerInterval = 1000l;
+        long halfExpiryInterval = expiryInterval / 2;
+
+        ExpiringMap<String, String> instance = new ExpiringMap<>("Test", 10, expiryInterval, cleanerInterval);
+
+        instance.put("key1", "value1");
+        instance.put("key2", "value2");
+        instance.put("key3", "value3");
+        instance.put("key4", "value4");
+        instance.startExpiry();
+        Thread.sleep(halfExpiryInterval + 100);
+        instance.put("key5", "value5");
+        instance.put("key6", "value6");
+        instance.setExpiryInterval(4000l);
+        //System.out.println("Size Before: " + instance.size());
+        Thread.sleep(halfExpiryInterval + cleanerInterval); //No cleaning should have taken place.
+        instance.stopExpiry();
+        //System.out.println("Size After: " + instance.size());
+        int result = instance.size();
+        int expResult = 6;
+
+        //System.out.println("Exp: " + expResult);
+        //System.out.println("Res: " + result);
+        assertEquals(expResult, result);
+    }
+
+    /**
+     * Test of put method, of class ExpiringMap.
+     *
+     * @throws java.lang.InterruptedException
+     */
+    @Test
+    public void testExpiry_change_expiry_interval_reduced() throws InterruptedException {
+        System.out.println("expiry_change_expiry_interval_reduced");
+
+        long expiryInterval = 4000l;
+        long cleanerInterval = 1000l;
+        long halfExpiryInterval = expiryInterval / 2;
+
+        ExpiringMap<String, String> instance = new ExpiringMap<>("Test", 10, expiryInterval, cleanerInterval);
+
+        instance.put("key1", "value1");
+        instance.put("key2", "value2");
+        instance.put("key3", "value3");
+        instance.put("key4", "value4");
+        instance.startExpiry();
+        Thread.sleep(halfExpiryInterval + 100);
+        instance.put("key5", "value5");
+        instance.put("key6", "value6");
+        instance.setExpiryInterval(2000l);
+        //System.out.println("Size Before: " + instance.size());
+        Thread.sleep(halfExpiryInterval + cleanerInterval); //All should have been removed.
+        instance.stopExpiry();
+        //System.out.println("Size After: " + instance.size());
+        int result = instance.size();
+        int expResult = 0;
+
+        //System.out.println("Exp: " + expResult);
+        //System.out.println("Res: " + result);
+        assertEquals(expResult, result);
+    }
+
+    /**
+     * Test of put method, of class ExpiringMap.
+     *
+     * @throws java.lang.InterruptedException
+     */
+    @Test
+    public void testExpiry_set_cleaner() throws InterruptedException {
+        System.out.println("expiry_set_cleaner");
+
+        long expiryInterval = 2000l;
+        long cleanerInterval = 1000l;
+        long halfExpiryInterval = expiryInterval / 2;
+
+        ExpiringMap<String, String> instance = new ExpiringMap<>("Test", 5, expiryInterval, cleanerInterval);
+
+        instance.put("key1", "value1");
+        instance.put("key2", "value2");
+        instance.put("key3", "value3");
+        instance.put("key4", "value4");
+        instance.startExpiry();
+        Thread.sleep(halfExpiryInterval + 100);
+        instance.setCleanerInterval(500l); //No obvious effect should occur.
+        instance.put("key5", "value5"); //Should be rejected.
+        instance.put("key6", "value6");
+        //System.out.println("Size Before: " + instance.size());
+        Thread.sleep(halfExpiryInterval + cleanerInterval);
+        instance.stopExpiry();
+        //System.out.println("Size After: " + instance.size());
+        int result = instance.size();
+        int expResult = 1;
+
+        //System.out.println("Exp: " + expResult);
+        //System.out.println("Res: " + result);
+        assertEquals(expResult, result);
+    }
+
 }
