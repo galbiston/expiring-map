@@ -181,7 +181,8 @@ public class ExpiringMap<K, V> extends ConcurrentHashMap<K, V> {
     }
 
     /**
-     * Maximum number of items in the map.
+     * Maximum number of items in the map.<br>
+     * Capacity will not be reduced.
      *
      * @param maxSize
      */
@@ -203,12 +204,24 @@ public class ExpiringMap<K, V> extends ConcurrentHashMap<K, V> {
      * @param cleanerInterval Milliseconds
      */
     public final void setCleanerInterval(long cleanerInterval) {
+
+        boolean isChanged = applyCleanerInterval(cleanerInterval);
+
+        //Reset the expiry if running and changed.
+        if (running && isChanged) {
+            startExpiry();
+        }
+    }
+
+    private boolean applyCleanerInterval(long cleanerInterval) {
+        long originalCleanerInterval = this.cleanerInterval;
         if (MINIMUM_MAP_CLEANER_INTERVAL < cleanerInterval) {
             this.cleanerInterval = cleanerInterval;
         } else {
             LOGGER.warn("Cleaner Interval: {} less than minimum: {}. Setting to minimum.", cleanerInterval, MINIMUM_MAP_CLEANER_INTERVAL);
             this.cleanerInterval = MINIMUM_MAP_CLEANER_INTERVAL;
         }
+        return originalCleanerInterval != this.cleanerInterval;
     }
 
     /**
@@ -220,7 +233,8 @@ public class ExpiringMap<K, V> extends ConcurrentHashMap<K, V> {
     }
 
     /**
-     * Duration that items remain in map.
+     * Duration that items remain in map.<br>
+     * Items will not be removed until next cleaner interval.
      *
      * @param expiryInterval Milliseconds
      */
@@ -263,10 +277,19 @@ public class ExpiringMap<K, V> extends ConcurrentHashMap<K, V> {
         this.fullMapWarningInterval = fullMapWarningInterval;
     }
 
+    /**
+     *
+     * @return Label of the Expiring Map.
+     */
     public String getLabel() {
         return label;
     }
 
+    /**
+     * Set the label of the Expiring Map.
+     *
+     * @param label
+     */
     public void setLabel(String label) {
         this.label = label;
     }
@@ -281,11 +304,12 @@ public class ExpiringMap<K, V> extends ConcurrentHashMap<K, V> {
     /**
      * Start expiring items from the map with adjusted cleaner interval.
      *
-     * @param cleanerInterval Milliseconds
+     * @param cleanerInterval Milliseconds between checks for expiry.
      */
     public void startExpiry(long cleanerInterval) {
-        if (expiring && cleanerTimer == null) {
-            setCleanerInterval(cleanerInterval);
+        stopExpiry();
+        if (expiring) {
+            applyCleanerInterval(cleanerInterval);
             cleanerTimer = new Timer(label, true);
             mapCleaner = new ExpiringMapCleaner(mapCleaner);
             cleanerTimer.scheduleAtFixedRate(mapCleaner, this.cleanerInterval, this.cleanerInterval);
@@ -306,10 +330,18 @@ public class ExpiringMap<K, V> extends ConcurrentHashMap<K, V> {
         running = false;
     }
 
+    /**
+     *
+     * @return True if the Expiring Map is running.
+     */
     public boolean isRunning() {
         return running;
     }
 
+    /**
+     *
+     * @return True if the Expiring Map will remove items.
+     */
     public boolean isExpiring() {
         return expiring;
     }
