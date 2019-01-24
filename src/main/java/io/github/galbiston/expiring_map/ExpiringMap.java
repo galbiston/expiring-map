@@ -19,8 +19,8 @@ package io.github.galbiston.expiring_map;
 
 import static io.github.galbiston.expiring_map.MapDefaultValues.FULL_MAP_WARNING_INTERVAL;
 import static io.github.galbiston.expiring_map.MapDefaultValues.MAP_CLEANER_INTERVAL;
-import static io.github.galbiston.expiring_map.MapDefaultValues.MAP_EXPIRY_INTERVAL;
 import static io.github.galbiston.expiring_map.MapDefaultValues.MINIMUM_MAP_CLEANER_INTERVAL;
+import static io.github.galbiston.expiring_map.MapDefaultValues.UNLIMITED_EXPIRY;
 import static io.github.galbiston.expiring_map.MapDefaultValues.UNLIMITED_INITIAL_CAPACITY;
 import static io.github.galbiston.expiring_map.MapDefaultValues.UNLIMITED_MAP;
 import java.lang.invoke.MethodHandles;
@@ -42,6 +42,8 @@ public class ExpiringMap<K, V> extends ConcurrentHashMap<K, V> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private String label;
+    private boolean running;
+    private boolean expiring;
     private long maxSize;
     private long expiryInterval;
     private long cleanerInterval;
@@ -51,15 +53,24 @@ public class ExpiringMap<K, V> extends ConcurrentHashMap<K, V> {
     private Timer cleanerTimer;
 
     /**
-     * Instance of Expiring Map that will remove items after a period of time
-     * which have not been accessed.
+     * Instance of Expiring Map that will not remove items and has no limit on
+     * size.
      *
      * @param label Name of the map.
-     * @param maxSize Maximum size of the map when items will no longer be
-     * added. Unlimited size (-1) will still remove expired items.
+     */
+    public ExpiringMap(String label) {
+        this(label, UNLIMITED_MAP, UNLIMITED_EXPIRY, MAP_CLEANER_INTERVAL, FULL_MAP_WARNING_INTERVAL);
+    }
+
+    /**
+     * Instance of Expiring Map that will not remove items.
+     *
+     * @param label Name of the map.
+     * @param maxSize Maximum size of the map when items will no longer be added
+     * or unlimited size (-1).
      */
     public ExpiringMap(String label, int maxSize) {
-        this(label, maxSize, MAP_EXPIRY_INTERVAL, MAP_CLEANER_INTERVAL, FULL_MAP_WARNING_INTERVAL);
+        this(label, maxSize, UNLIMITED_EXPIRY, MAP_CLEANER_INTERVAL, FULL_MAP_WARNING_INTERVAL);
     }
 
     /**
@@ -106,13 +117,15 @@ public class ExpiringMap<K, V> extends ConcurrentHashMap<K, V> {
         super(maxSize > UNLIMITED_MAP ? maxSize : UNLIMITED_INITIAL_CAPACITY);
         this.label = label;
         this.maxSize = maxSize > UNLIMITED_MAP ? maxSize : Long.MAX_VALUE;
+        this.running = false;
+        this.expiring = false;
+        this.cleanerTimer = null;
+        this.mapCleaner = null;
         setCleanerInterval(cleanerInterval);
-        setExpiryInterval(expiryInterval);
+        setExpiryInterval(expiryInterval); //Can set expiryInterval, mapCleaner and expiring.
         this.fullMapWarningInterval = fullMapWarningInterval;
         this.fullMapWarning = System.currentTimeMillis();
-        this.mapCleaner = new ExpiringMapCleaner(this, expiryInterval);
 
-        this.cleanerTimer = null;
     }
 
     @Override
@@ -213,15 +226,22 @@ public class ExpiringMap<K, V> extends ConcurrentHashMap<K, V> {
      */
     public final void setExpiryInterval(long expiryInterval) {
 
+        this.expiring = expiryInterval > UNLIMITED_EXPIRY;
+
         long minimum_interval = cleanerInterval + 1;
         if (expiryInterval < minimum_interval) {
-            LOGGER.warn("Expiry Interval: {} cannot be less than Cleaner Interval: {}. Setting to Minimum Interval: {}", expiryInterval, cleanerInterval, minimum_interval);
+            if (this.expiring) {
+                //Ensure that the expiry interval is greater than the cleaner interval and warn that value has been changed.
+                LOGGER.warn("Expiry Interval: {} cannot be less than Cleaner Interval: {}. Setting to Minimum Interval: {}", expiryInterval, cleanerInterval, minimum_interval);
+            }
             this.expiryInterval = minimum_interval;
         } else {
             this.expiryInterval = expiryInterval;
         }
 
-        if (this.mapCleaner != null) {
+        if (this.mapCleaner == null) {
+            this.mapCleaner = new ExpiringMapCleaner(this, expiryInterval);
+        } else {
             this.mapCleaner.setExpiryInterval(this.expiryInterval);
         }
     }
@@ -264,12 +284,14 @@ public class ExpiringMap<K, V> extends ConcurrentHashMap<K, V> {
      * @param cleanerInterval Milliseconds
      */
     public void startExpiry(long cleanerInterval) {
-        if (cleanerTimer == null) {
+        if (expiring && cleanerTimer == null) {
             setCleanerInterval(cleanerInterval);
             cleanerTimer = new Timer(label, true);
             mapCleaner = new ExpiringMapCleaner(mapCleaner);
             cleanerTimer.scheduleAtFixedRate(mapCleaner, this.cleanerInterval, this.cleanerInterval);
         }
+
+        running = true;
     }
 
     /**
@@ -280,11 +302,21 @@ public class ExpiringMap<K, V> extends ConcurrentHashMap<K, V> {
             cleanerTimer.cancel();
             cleanerTimer = null;
         }
+
+        running = false;
+    }
+
+    public boolean isRunning() {
+        return running;
+    }
+
+    public boolean isExpiring() {
+        return expiring;
     }
 
     @Override
     public String toString() {
-        return "ExpiringMap{" + "label=" + label + ", maxSize=" + maxSize + ", expiryInterval=" + expiryInterval + ", cleanerInterval=" + cleanerInterval + ", fullMapWarningInterval=" + fullMapWarningInterval + ", fullMapWarning=" + fullMapWarning + ", mapCleaner=" + mapCleaner + ", cleanerTimer=" + cleanerTimer + '}';
+        return "ExpiringMap{" + "label=" + label + ", running=" + running + ", expiring=" + expiring + ", maxSize=" + maxSize + ", expiryInterval=" + expiryInterval + ", cleanerInterval=" + cleanerInterval + ", fullMapWarningInterval=" + fullMapWarningInterval + ", fullMapWarning=" + fullMapWarning + ", mapCleaner=" + mapCleaner + ", cleanerTimer=" + cleanerTimer + '}';
     }
 
 }

@@ -19,6 +19,7 @@ package io.github.galbiston.expiring_map;
 
 import static io.github.galbiston.expiring_map.MapDefaultValues.MAP_CLEANER_INTERVAL;
 import static io.github.galbiston.expiring_map.MapDefaultValues.MINIMUM_MAP_CLEANER_INTERVAL;
+import static io.github.galbiston.expiring_map.MapDefaultValues.UNLIMITED_EXPIRY;
 import org.junit.After;
 import org.junit.AfterClass;
 import static org.junit.Assert.assertEquals;
@@ -80,6 +81,38 @@ public class ExpiringMapTest {
         //System.out.println("Size After: " + instance.size());
         int result = instance.size();
         int expResult = 1;
+
+        //System.out.println("Exp: " + expResult);
+        //System.out.println("Res: " + result);
+        assertEquals(expResult, result);
+    }
+
+    /**
+     * Test of put method, of class ExpiringMap.
+     *
+     * @throws java.lang.InterruptedException
+     */
+    @Test
+    public void testExpiry_none() throws InterruptedException {
+        System.out.println("expiry_none");
+
+        ExpiringMap<String, String> instance = new ExpiringMap<>("Test");
+
+        instance.put("key1", "value1");
+        instance.put("key2", "value2");
+        instance.put("key3", "value3");
+        instance.put("key4", "value4");
+        instance.startExpiry();
+        Thread.sleep(1000);
+        instance.put("key5", "value5");
+        instance.put("key6", "value6");
+
+        //System.out.println("Size Before: " + instance.size());
+        Thread.sleep(1000);
+        instance.stopExpiry();
+        //System.out.println("Size After: " + instance.size());
+        int result = instance.size();
+        int expResult = 6;
 
         //System.out.println("Exp: " + expResult);
         //System.out.println("Res: " + result);
@@ -218,6 +251,40 @@ public class ExpiringMapTest {
         instance.setExpiryInterval(expiryInterval);
         long expResult = MAP_CLEANER_INTERVAL + 1;
         long result = instance.getExpiryInterval();
+
+        //System.out.println("Exp: " + expResult);
+        //System.out.println("Res: " + result);
+        assertEquals(expResult, result);
+    }
+
+    /**
+     * Test of isExpiring method, of class ExpiringMap.
+     */
+    @Test
+    public void testIsExpiring() {
+        System.out.println("isExpiring");
+        long expiryInterval = 1000L;
+        ExpiringMap instance = new ExpiringMap<>("Test", 5);
+        instance.setExpiryInterval(expiryInterval);
+        boolean expResult = true;
+        boolean result = instance.isExpiring();
+
+        //System.out.println("Exp: " + expResult);
+        //System.out.println("Res: " + result);
+        assertEquals(expResult, result);
+    }
+
+    /**
+     * Test of isExpiring method, of class ExpiringMap.
+     */
+    @Test
+    public void testIsExpiring_false() {
+        System.out.println("isExpiring_false");
+        long expiryInterval = UNLIMITED_EXPIRY;
+        ExpiringMap instance = new ExpiringMap<>("Test", 5);
+        instance.setExpiryInterval(expiryInterval);
+        boolean expResult = false;
+        boolean result = instance.isExpiring();
 
         //System.out.println("Exp: " + expResult);
         //System.out.println("Res: " + result);
