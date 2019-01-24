@@ -116,7 +116,7 @@ public class ExpiringMap<K, V> extends ConcurrentHashMap<K, V> {
     public ExpiringMap(String label, int maxSize, long expiryInterval, long cleanerInterval, long fullMapWarningInterval) {
         super(maxSize > UNLIMITED_MAP ? maxSize : UNLIMITED_INITIAL_CAPACITY);
         this.label = label;
-        this.maxSize = maxSize > UNLIMITED_MAP ? maxSize : Long.MAX_VALUE;
+        setMaxSize(maxSize);
         this.running = false;
         this.expiring = false;
         this.cleanerTimer = null;
@@ -185,7 +185,7 @@ public class ExpiringMap<K, V> extends ConcurrentHashMap<K, V> {
      *
      * @param maxSize
      */
-    public void setMaxSize(long maxSize) {
+    public final void setMaxSize(long maxSize) {
         this.maxSize = maxSize > UNLIMITED_MAP ? maxSize : Long.MAX_VALUE;
     }
 
